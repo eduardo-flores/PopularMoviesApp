@@ -19,25 +19,38 @@ public final class NetworkUtils {
     private static final String MOVIE_DATABASE_URL =
             "https://api.themoviedb.org";
 
+    private static final String POSTER_BASE_URL =
+            "http://image.tmdb.org/t/p/";
+
     private static final String API_KEY_PARAM = "api_key";
 
+    private static final String POSTER_SIZE = "w185";
     private static final String AUTH_VERSION = "3";
-
     private static final String MOVIE_PATH = "movie";
+
     private static final String POPULAR_PATH = "popular";
     private static final String TOP_RATED_PATH = "top_rated";
-
 
     /**
      * Builds the URL used to return the list of movies
      *
      * @return The URL to use to query the The Movie DB.
      */
-    public static URL buildUrl() {
+    public static URL buildUrl(Sort sort) {
+        String sortPath = POPULAR_PATH;
+        switch (sort) {
+            case POPULAR:
+                sortPath = POPULAR_PATH;
+                break;
+            case TOP_RATED:
+                sortPath = TOP_RATED_PATH;
+                break;
+        }
+
         Uri builtUri = Uri.parse(MOVIE_DATABASE_URL).buildUpon()
                 .appendPath(AUTH_VERSION)
                 .appendPath(MOVIE_PATH)
-                .appendPath(POPULAR_PATH)
+                .appendPath(sortPath)
                 .appendQueryParameter(API_KEY_PARAM, BuildConfig.MOVIE_DB_API_KEY)
                 .build();
 
@@ -51,6 +64,34 @@ public final class NetworkUtils {
         Log.v(TAG, "Built URI " + url);
 
         return url;
+    }
+
+    /**
+     * Builds the URL used to return the Movie poster
+     *
+     * @return The URL to of the image
+     */
+    public static URL buildImageUrl(String imageFile) {
+        Uri builtUri = Uri.parse(POSTER_BASE_URL).buildUpon()
+                .appendPath(POSTER_SIZE)
+                .appendPath(imageFile)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        Log.v(TAG, "Built URI " + url);
+
+        return url;
+    }
+
+    public enum Sort {
+        POPULAR,
+        TOP_RATED
     }
 
     /**

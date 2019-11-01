@@ -1,8 +1,13 @@
 package com.flores.popularmoviesapp;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -42,13 +47,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
 
-        loadMovieData();
+        loadMovieData(NetworkUtils.Sort.POPULAR.name());
     }
 
-    private void loadMovieData() {
+    private void loadMovieData(String sortName) {
         showMovieDataView();
 
-        new FetchMovieTask().execute();
+        new FetchMovieTask().execute(sortName);
     }
 
     private void showMovieDataView() {
@@ -60,7 +65,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     @Override
     public void onClick(String movie) {
-
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(getApplicationContext().CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("label", movie);
+        clipboard.setPrimaryClip(clip);
     }
 
     private void showErrorMessage(String message) {
@@ -71,6 +78,31 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             mErrorMessageDisplay.setText(message);
         }
         mErrorMessageDisplay.setVisibility(View.VISIBLE);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_sort_popular) {
+            loadMovieData(NetworkUtils.Sort.POPULAR.name());
+            return true;
+        }
+
+        if (id == R.id.action_sort_top_rated) {
+            loadMovieData(NetworkUtils.Sort.TOP_RATED.name());
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.sort, menu);
+        return true;
     }
 
     public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
@@ -85,7 +117,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         @Override
         protected String[] doInBackground(String... params) {
 
-            URL weatherRequestUrl = NetworkUtils.buildUrl();
+            if (params.length == 0) {
+                return null;
+            }
+
+            String sortName = params[0];
+            URL weatherRequestUrl = NetworkUtils.buildUrl(NetworkUtils.Sort.valueOf(sortName));
 
             try {
                 String jsonResponse = NetworkUtils

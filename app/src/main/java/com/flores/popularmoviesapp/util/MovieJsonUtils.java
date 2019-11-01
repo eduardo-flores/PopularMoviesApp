@@ -64,6 +64,7 @@ public final class MovieJsonUtils {
             poster = movie.getString(MOVIE_POSTER);
 
             parsedData[i] = id + " - " + title + " - " + rating + " - " + poster;
+            parsedData[i] = NetworkUtils.buildImageUrl(poster.replace("/", "")).toString();
         }
 
         return parsedData;

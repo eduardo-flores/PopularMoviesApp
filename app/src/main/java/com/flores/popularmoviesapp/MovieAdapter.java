@@ -5,9 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.ImageView;
 
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.squareup.picasso.Picasso;
 
 /**
  * {@link MovieAdapter} exposes a list of movies a
@@ -36,7 +38,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     @Override
     public void onBindViewHolder(MovieAdapterViewHolder movieAdapterViewHolder, int position) {
         String movie = mMovieData[position];
-        movieAdapterViewHolder.mMovieTextView.setText(movie);
+
+        Picasso.get()
+                .load(movie)
+                .into(movieAdapterViewHolder.mMovieImageView);
     }
 
     @Override
@@ -44,6 +49,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         if (null == mMovieData) return 0;
         return mMovieData.length;
     }
+
 
     public void setMovieData(String[] movieData) {
         mMovieData = movieData;
@@ -55,11 +61,11 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     }
 
     public class MovieAdapterViewHolder extends RecyclerView.ViewHolder implements OnClickListener {
-        public final TextView mMovieTextView;
+        public final ImageView mMovieImageView;
 
         public MovieAdapterViewHolder(View view) {
             super(view);
-            mMovieTextView = view.findViewById(R.id.tv_movie);
+            mMovieImageView = view.findViewById(R.id.iv_movie_poster);
             view.setOnClickListener(this);
         }
 
