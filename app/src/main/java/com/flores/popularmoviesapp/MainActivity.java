@@ -1,7 +1,7 @@
 package com.flores.popularmoviesapp;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +15,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.flores.popularmoviesapp.data.Movie;
 import com.flores.popularmoviesapp.util.MovieJsonUtils;
 import com.flores.popularmoviesapp.util.NetworkUtils;
 
@@ -64,10 +65,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     }
 
     @Override
-    public void onClick(String movie) {
-        ClipboardManager clipboard = (ClipboardManager) getSystemService(getApplicationContext().CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText("label", movie);
-        clipboard.setPrimaryClip(clip);
+    public void onClick(Movie movie) {
+        Class destinationClass = MovieDetailActivity.class;
+        Intent intentToStartDetailActivity = new Intent(this, destinationClass);
+        intentToStartDetailActivity.putExtra(MovieDetailActivity.EXTRA_MOVIE, movie);
+        startActivity(intentToStartDetailActivity);
     }
 
     private void showErrorMessage(String message) {
@@ -105,7 +107,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         return true;
     }
 
-    public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
+    @SuppressLint("StaticFieldLeak")
+    private class FetchMovieTask extends AsyncTask<String, Void, String[]> {
         private String errorMessage;
 
         @Override
@@ -125,12 +128,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             URL weatherRequestUrl = NetworkUtils.buildUrl(NetworkUtils.Sort.valueOf(sortName));
 
             try {
-                String jsonResponse = NetworkUtils
-                        .getResponseFromHttpUrl(weatherRequestUrl);
+                String jsonResponse = NetworkUtils.getResponseFromHttpUrl(weatherRequestUrl);
 
-                String[] simpleData = MovieJsonUtils.getListFromJson(jsonResponse);
-
-                return simpleData;
+                return MovieJsonUtils.getListFromJson(jsonResponse);
 
             } catch (Exception e) {
                 errorMessage = "Error: " + e.getMessage();
