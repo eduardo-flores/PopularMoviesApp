@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private void showMovieDataView() {
         /* First, make sure the error is invisible */
         mErrorMessageDisplay.setVisibility(View.INVISIBLE);
-        /* Then, make sure the weather data is visible */
+        /* Then, make sure the movie data is visible */
         mRecyclerView.setVisibility(View.VISIBLE);
     }
 
@@ -125,10 +125,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             }
 
             String sortName = params[0];
-            URL weatherRequestUrl = NetworkUtils.buildUrl(NetworkUtils.Sort.valueOf(sortName));
+            URL requestUrl = NetworkUtils.buildUrl(NetworkUtils.Sort.valueOf(sortName));
 
             try {
-                String jsonResponse = NetworkUtils.getResponseFromHttpUrl(weatherRequestUrl);
+                String jsonResponse = NetworkUtils.getResponseFromHttpUrl(requestUrl);
 
                 return MovieJsonUtils.getListFromJson(jsonResponse);
 

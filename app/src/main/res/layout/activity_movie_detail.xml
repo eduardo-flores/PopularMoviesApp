@@ -1,68 +1,184 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MovieDetailActivity">
+    android:layout_height="match_parent">
 
-
-    <TextView
-        android:id="@+id/tv_detail_title"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:paddingStart="16dp"
-        android:paddingTop="32dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="32dp"
-        android:textColor="@android:color/white"
-        android:textSize="40sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Movie Title" />
+        tools:context=".MovieDetailActivity">
 
-    <ImageView
-        android:id="@+id/iv_detail_movie_poster"
-        android:layout_width="140dp"
-        android:layout_height="220dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:contentDescription="@string/image_description"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_detail_title" />
+        <TextView
+            android:id="@+id/tv_detail_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:paddingStart="@dimen/padding_regular"
+            android:paddingTop="@dimen/padding_large"
+            android:paddingEnd="@dimen/padding_regular"
+            android:paddingBottom="@dimen/padding_large"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/textSize_extraLarge"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Movie Title" />
 
-    <TextView
-        android:id="@+id/tv_detail_release_date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/tv_detail_vote_average"
-        app:layout_constraintStart_toEndOf="@+id/iv_detail_movie_poster"
-        app:layout_constraintTop_toTopOf="@+id/iv_detail_movie_poster"
-        tools:text="01/01/2019" />
+        <ImageView
+            android:id="@+id/iv_detail_movie_poster"
+            android:layout_width="140dp"
+            android:layout_height="220dp"
+            android:layout_marginStart="@dimen/padding_regular"
+            android:layout_marginTop="@dimen/padding_regular"
+            android:contentDescription="@string/image_description"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_detail_title" />
 
-    <TextView
-        android:id="@+id/tv_detail_vote_average"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintBottom_toBottomOf="@+id/iv_detail_movie_poster"
-        app:layout_constraintStart_toEndOf="@+id/iv_detail_movie_poster"
-        app:layout_constraintTop_toBottomOf="@+id/tv_detail_release_date"
-        tools:text="8.4" />
+        <TextView
+            android:id="@+id/tv_detail_release_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/padding_regular"
+            android:layout_marginEnd="@dimen/padding_regular"
+            android:textSize="@dimen/textSize_large"
+            app:layout_constraintBottom_toTopOf="@+id/tv_detail_vote_average"
+            app:layout_constraintStart_toEndOf="@+id/iv_detail_movie_poster"
+            app:layout_constraintTop_toTopOf="@+id/iv_detail_movie_poster"
+            tools:text="01/01/2019" />
 
-    <TextView
-        android:id="@+id/tv_detail_synopsis"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/iv_detail_movie_poster"
-        tools:text="Movie details synopsis" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/tv_detail_vote_average"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/padding_regular"
+            android:layout_marginTop="@dimen/padding_regular"
+            android:layout_marginEnd="@dimen/padding_regular"
+            android:textSize="@dimen/textSize_large"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_detail_movie_poster"
+            app:layout_constraintStart_toEndOf="@+id/iv_detail_movie_poster"
+            app:layout_constraintTop_toBottomOf="@+id/tv_detail_release_date"
+            tools:text="8.4" />
+
+        <TextView
+            android:id="@+id/tv_detail_synopsis"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_regular"
+            android:paddingStart="@dimen/padding_regular"
+            android:paddingEnd="@dimen/padding_regular"
+            android:paddingBottom="@dimen/padding_small"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/iv_detail_movie_poster"
+            tools:text="Movie details synopsis" />
+
+        <!--This View serves as a visual divider between list items-->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/line_1dp"
+            android:layout_marginStart="@dimen/padding_regular"
+            android:layout_marginEnd="@dimen/padding_regular"
+            android:background="@color/regularGrey"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_detail_synopsis"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_trailer_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_regular"
+            android:paddingStart="@dimen/padding_regular"
+            android:paddingEnd="@dimen/padding_regular"
+            android:text="@string/trailers_label"
+            android:textSize="@dimen/textSize_regular"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_detail_synopsis" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_trailers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/padding_large"
+            android:paddingEnd="@dimen/padding_large"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_trailer_label" />
+
+        <TextView
+            android:id="@+id/tv_error_message_display"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_regular"
+            android:textSize="@dimen/textSize_regular"
+            android:visibility="invisible"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_trailer_label" />
+
+        <ProgressBar
+            android:id="@+id/pb_loading_indicator"
+            android:layout_width="@dimen/progressBar_size"
+            android:layout_height="@dimen/progressBar_size"
+            android:layout_gravity="center"
+            android:visibility="invisible"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_trailer_label" />
+
+        <!--This View serves as a visual divider between list items-->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/line_1dp"
+            android:layout_marginStart="@dimen/padding_regular"
+            android:layout_marginEnd="@dimen/padding_regular"
+            android:background="@color/regularGrey"
+            app:layout_constraintBottom_toBottomOf="@+id/rv_trailers"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_review_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_regular"
+            android:paddingStart="@dimen/padding_regular"
+            android:paddingEnd="@dimen/padding_regular"
+            android:text="@string/reviews_label"
+            android:textSize="@dimen/textSize_regular"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/rv_trailers" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_reviews"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/padding_large"
+            android:paddingEnd="@dimen/padding_large"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_review_label" />
+
+        <TextView
+            android:id="@+id/tv_error_message_display_review"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_regular"
+            android:textSize="@dimen/textSize_regular"
+            android:visibility="invisible"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_review_label" />
+
+        <ProgressBar
+            android:id="@+id/pb_loading_indicator_review"
+            android:layout_width="@dimen/progressBar_size"
+            android:layout_height="@dimen/progressBar_size"
+            android:layout_gravity="center"
+            android:visibility="invisible"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_review_label" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
