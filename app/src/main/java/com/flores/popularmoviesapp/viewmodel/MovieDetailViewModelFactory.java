@@ -26,7 +26,7 @@ import com.flores.popularmoviesapp.data.MovieRepository;
 public class MovieDetailViewModelFactory extends ViewModelProvider.NewInstanceFactory {
 
     private final MovieRepository mRepository;
-    private int mMovieId;
+    private final int mMovieId;
 
     public MovieDetailViewModelFactory(MovieRepository repository, int movieId) {
         this.mRepository = repository;

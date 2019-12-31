@@ -8,7 +8,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
@@ -20,6 +19,8 @@ import com.flores.popularmoviesapp.util.NetworkUtils;
 import com.flores.popularmoviesapp.viewmodel.MainActivityViewModel;
 import com.flores.popularmoviesapp.viewmodel.MainViewModelFactory;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieAdapterOnClickHandler {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
@@ -27,10 +28,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private RecyclerView mRecyclerView;
     private MovieAdapter mMovieAdapter;
 
-    private TextView mErrorMessageDisplay;
-
     private ProgressBar mLoadingIndicator;
     private MainActivityViewModel mViewModel;
+
+    private List<Movie> mMovies;
+    private List<Movie> mMoviesFavorite;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,27 +46,39 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mMovieAdapter = new MovieAdapter(this);
         mRecyclerView.setAdapter(mMovieAdapter);
 
-        mErrorMessageDisplay = findViewById(R.id.tv_error_message_display);
-
         mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
 
         MainViewModelFactory factory = InjectorUtils.provideMainActivityViewModelFactory(this.getApplicationContext());
         mViewModel = ViewModelProviders.of(this, factory).get(MainActivityViewModel.class);
 
         mViewModel.getMovies().observe(this, movies -> {
-            mMovieAdapter.setMovieData(movies);
-            if (movies != null && movies.size() != 0) showMovieDataView();
-            else showLoading();
+            mMovies = movies;
+            showData();
+        });
+
+        mViewModel.getMoviesFavorite().observe(this, movies -> {
+            mMoviesFavorite = movies;
+            showData();
         });
 
         Log.d(LOG_TAG, "Main activity created");
     }
 
+    private void showData() {
+        List<Movie> movies;
+        if (mViewModel.isShowFavorite()) {
+            movies = mMoviesFavorite;
+        } else {
+            movies = mMovies;
+        }
+        mMovieAdapter.setMovieData(movies);
+        if (movies != null && movies.size() != 0) showMovieDataView();
+        else showLoading();
+    }
+
     private void showMovieDataView() {
         Log.d(LOG_TAG, "showMovieDataView");
-        /* First, make sure the error is invisible */
-        mErrorMessageDisplay.setVisibility(View.INVISIBLE);
-        /* Then, make sure the movie data is visible */
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.VISIBLE);
     }
 
@@ -79,9 +93,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     private void showLoading() {
         Log.d(LOG_TAG, "Loading");
-        // Then, hide the weather data
         mRecyclerView.setVisibility(View.INVISIBLE);
-        // Finally, show the loading indicator
         mLoadingIndicator.setVisibility(View.VISIBLE);
     }
 
@@ -91,11 +103,19 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         if (id == R.id.action_sort_popular) {
             mViewModel.fetchMovies(NetworkUtils.Sort.POPULAR.name());
+            mViewModel.setShowFavorite(false);
             return true;
         }
 
         if (id == R.id.action_sort_top_rated) {
             mViewModel.fetchMovies(NetworkUtils.Sort.TOP_RATED.name());
+            mViewModel.setShowFavorite(false);
+            return true;
+        }
+
+        if (id == R.id.action_sort_favorite) {
+            mViewModel.setShowFavorite(true);
+            showData();
             return true;
         }
 

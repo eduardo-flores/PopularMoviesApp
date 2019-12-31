@@ -25,7 +25,7 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
 // List of the entry classes and associated TypeConverters
-@Database(entities = {Movie.class}, version = 1)
+@Database(entities = {Movie.class}, version = 1, exportSchema = false)
 public abstract class MovieDatabase extends RoomDatabase {
 
     private static final String LOG_TAG = MovieDatabase.class.getSimpleName();
