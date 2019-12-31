@@ -3,7 +3,6 @@ package com.flores.popularmoviesapp;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,20 +11,21 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.flores.popularmoviesapp.data.Movie;
 import com.flores.popularmoviesapp.data.Trailer;
-import com.flores.popularmoviesapp.util.MovieJsonUtils;
+import com.flores.popularmoviesapp.data.database.Movie;
+import com.flores.popularmoviesapp.util.InjectorUtils;
 import com.flores.popularmoviesapp.util.NetworkUtils;
+import com.flores.popularmoviesapp.viewmodel.MovieDetailActivityViewModel;
+import com.flores.popularmoviesapp.viewmodel.MovieDetailViewModelFactory;
 import com.squareup.picasso.Picasso;
-
-import java.net.URL;
 
 public class MovieDetailActivity extends AppCompatActivity implements TrailerAdapter.TrailerAdapterOnClickHandler {
 
-    private static final String TAG = MovieDetailActivity.class.getSimpleName();
-    public static final String EXTRA_MOVIE = "com.flores.popularmoviesapp.data.Movie";
+    public static final String EXTRA_MOVIE = "com.flores.popularmoviesapp.data.database.Movie";
+    private static final String LOG_TAG = MovieDetailActivity.class.getSimpleName();
 
     private TrailerAdapter mTrailerAdapter;
     private ReviewAdapter mReviewAdapter;
@@ -37,6 +37,7 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
     private RecyclerView mRecyclerViewReview;
     private TextView mErrorMessageDisplayReview;
     private ProgressBar mLoadingIndicatorReview;
+    private MovieDetailActivityViewModel mViewModel;
 
     private Movie mMovie;
     private TextView mTitle;
@@ -44,6 +45,7 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
     private TextView mVoteAverage;
     private TextView mSynopsis;
     private ImageView mImagePoster;
+    private ImageView mImageFavorite;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -56,6 +58,11 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
         mVoteAverage = findViewById(R.id.tv_detail_vote_average);
         mSynopsis = findViewById(R.id.tv_detail_synopsis);
         mImagePoster = findViewById(R.id.iv_detail_movie_poster);
+        mImageFavorite = findViewById(R.id.iv_favorite);
+        mImageFavorite.setOnClickListener(view -> {
+            Log.d(LOG_TAG, "Movie favorite clicked: " + mMovie.getId());
+            mViewModel.setFavorite(mMovie);
+        });
 
         mRecyclerView = findViewById(R.id.rv_trailers);
         mRecyclerView.setHasFixedSize(true);
@@ -81,15 +88,10 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
             if (intentThatStartedThisActivity.hasExtra(EXTRA_MOVIE)) {
                 mMovie = (Movie) intentThatStartedThisActivity.getSerializableExtra(EXTRA_MOVIE);
                 if (mMovie != null) {
-                    mTitle.setText(mMovie.getTitle());
-                    mReleaseDate.setText(mMovie.getReleaseDate());
-                    mVoteAverage.setText(Double.toString(mMovie.getVoteAverage()));
-                    mSynopsis.setText(mMovie.getSynopsis());
+                    MovieDetailViewModelFactory factory = InjectorUtils.provideMovieDetailViewModelFactory(this.getApplicationContext(), mMovie.getId());
+                    mViewModel = ViewModelProviders.of(this, factory).get(MovieDetailActivityViewModel.class);
 
-                    Picasso.get()
-                            .load(mMovie.getPoster())
-                            .into(mImagePoster);
-
+                    bindToUI();
 
                     loadTrailerData();
 
@@ -97,6 +99,33 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
                 }
             }
         }
+    }
+
+    private void bindToUI() {
+        Log.d(LOG_TAG, "bindToUI");
+        mTitle.setText(mMovie.getTitle());
+        mReleaseDate.setText(mMovie.getReleaseDate());
+        mVoteAverage.setText(String.format(
+                getApplicationContext().getString(R.string.vote_average_format),
+                mMovie.getVoteAverage()
+        ));
+        mSynopsis.setText(mMovie.getSynopsis());
+        mImagePoster.setContentDescription(mMovie.getTitle());
+
+        Picasso.get()
+                .load(mMovie.getPoster())
+                .placeholder(R.drawable.ic_image_black_48dp)
+                .into(mImagePoster);
+
+        mViewModel.isFavorite().observe(this, isFavorite -> {
+            Log.d(LOG_TAG, "Movie isFavorite: " + isFavorite);
+            if (isFavorite) {
+                mImageFavorite.setImageResource(R.drawable.ic_favorite_black_24dp);
+            } else {
+                mImageFavorite.setImageResource(R.drawable.ic_favorite_border_black_48dp);
+            }
+            mImageFavorite.setVisibility(View.VISIBLE);
+        });
     }
 
     @Override
@@ -108,19 +137,11 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
     }
 
     private void loadTrailerData() {
-        showTrailerDataView();
-
-        new FetchTrailerTask().execute(String.valueOf(mMovie.getId()));
-    }
-
-    private void showErrorMessageTrailer(String message) {
-        /* First, hide the currently visible data */
-        mRecyclerView.setVisibility(View.INVISIBLE);
-        /* Then, show the error */
-        if (message != null) {
-            mErrorMessageDisplay.setText(message);
-        }
-        mErrorMessageDisplay.setVisibility(View.VISIBLE);
+        mViewModel.getTrailers().observe(this, trailers -> {
+            mTrailerAdapter.setTrailerData(trailers);
+            if (trailers != null && trailers.size() != 0) showTrailerDataView();
+            else mLoadingIndicator.setVisibility(View.VISIBLE);
+        });
     }
 
     private void showTrailerDataView() {
@@ -131,19 +152,11 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
     }
 
     private void loadReviewData() {
-        showReviewDataView();
-
-        new FetchReviewTask().execute(String.valueOf(mMovie.getId()));
-    }
-
-    private void showErrorMessageReview(String message) {
-        /* First, hide the currently visible data */
-        mRecyclerViewReview.setVisibility(View.INVISIBLE);
-        /* Then, show the error */
-        if (message != null) {
-            mErrorMessageDisplayReview.setText(message);
-        }
-        mErrorMessageDisplayReview.setVisibility(View.VISIBLE);
+        mViewModel.getReviews().observe(this, reviews -> {
+            mReviewAdapter.setReviewData(reviews);
+            if (reviews != null && reviews.size() != 0) showReviewDataView();
+            else mLoadingIndicatorReview.setVisibility(View.VISIBLE);
+        });
     }
 
     private void showReviewDataView() {
@@ -151,93 +164,5 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
         mErrorMessageDisplayReview.setVisibility(View.INVISIBLE);
         /* Then, make sure the trailer data is visible */
         mRecyclerViewReview.setVisibility(View.VISIBLE);
-    }
-
-    @SuppressLint("StaticFieldLeak")
-    private class FetchTrailerTask extends AsyncTask<String, Void, String[]> {
-        private String errorMessage;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mLoadingIndicator.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected String[] doInBackground(String... params) {
-
-            if (params.length == 0) {
-                return null;
-            }
-
-            String movieId = params[0];
-            URL requestUrl = NetworkUtils.buildTrailerUrl(movieId);
-
-            try {
-                String jsonResponse = NetworkUtils.getResponseFromHttpUrl(requestUrl);
-
-                return MovieJsonUtils.getListFromJson(jsonResponse);
-
-            } catch (Exception e) {
-                errorMessage = "Error: " + e.getMessage();
-                Log.d(TAG, errorMessage);
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String[] trailerData) {
-            mLoadingIndicator.setVisibility(View.INVISIBLE);
-            if (trailerData != null) {
-                showTrailerDataView();
-                mTrailerAdapter.setTrailerData(trailerData);
-            } else {
-                showErrorMessageTrailer(errorMessage);
-            }
-        }
-    }
-
-    @SuppressLint("StaticFieldLeak")
-    private class FetchReviewTask extends AsyncTask<String, Void, String[]> {
-        private String errorMessage;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mLoadingIndicatorReview.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected String[] doInBackground(String... params) {
-
-            if (params.length == 0) {
-                return null;
-            }
-
-            String movieId = params[0];
-            URL requestUrl = NetworkUtils.buildReviewUrl(movieId);
-
-            try {
-                String jsonResponse = NetworkUtils.getResponseFromHttpUrl(requestUrl);
-
-                return MovieJsonUtils.getListFromJson(jsonResponse);
-
-            } catch (Exception e) {
-                errorMessage = "Error: " + e.getMessage();
-                Log.d(TAG, errorMessage);
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String[] reviewData) {
-            mLoadingIndicatorReview.setVisibility(View.INVISIBLE);
-            if (reviewData != null) {
-                showReviewDataView();
-                mReviewAdapter.setReviewData(reviewData);
-            } else {
-                showErrorMessageReview(errorMessage);
-            }
-        }
     }
 }

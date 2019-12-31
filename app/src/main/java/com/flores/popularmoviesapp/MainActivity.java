@@ -1,8 +1,6 @@
 package com.flores.popularmoviesapp;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -13,17 +11,18 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.flores.popularmoviesapp.data.Movie;
-import com.flores.popularmoviesapp.util.MovieJsonUtils;
+import com.flores.popularmoviesapp.data.database.Movie;
+import com.flores.popularmoviesapp.util.InjectorUtils;
 import com.flores.popularmoviesapp.util.NetworkUtils;
-
-import java.net.URL;
+import com.flores.popularmoviesapp.viewmodel.MainActivityViewModel;
+import com.flores.popularmoviesapp.viewmodel.MainViewModelFactory;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieAdapterOnClickHandler {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     private RecyclerView mRecyclerView;
     private MovieAdapter mMovieAdapter;
@@ -31,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private TextView mErrorMessageDisplay;
 
     private ProgressBar mLoadingIndicator;
+    private MainActivityViewModel mViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,16 +48,20 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
 
-        loadMovieData(NetworkUtils.Sort.POPULAR.name());
-    }
+        MainViewModelFactory factory = InjectorUtils.provideMainActivityViewModelFactory(this.getApplicationContext());
+        mViewModel = ViewModelProviders.of(this, factory).get(MainActivityViewModel.class);
 
-    private void loadMovieData(String sortName) {
-        showMovieDataView();
+        mViewModel.getMovies().observe(this, movies -> {
+            mMovieAdapter.setMovieData(movies);
+            if (movies != null && movies.size() != 0) showMovieDataView();
+            else showLoading();
+        });
 
-        new FetchMovieTask().execute(sortName);
+        Log.d(LOG_TAG, "Main activity created");
     }
 
     private void showMovieDataView() {
+        Log.d(LOG_TAG, "showMovieDataView");
         /* First, make sure the error is invisible */
         mErrorMessageDisplay.setVisibility(View.INVISIBLE);
         /* Then, make sure the movie data is visible */
@@ -66,34 +70,32 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     @Override
     public void onClick(Movie movie) {
+        Log.d(LOG_TAG, "onClick: " + movie.getId());
         Class destinationClass = MovieDetailActivity.class;
         Intent intentToStartDetailActivity = new Intent(this, destinationClass);
         intentToStartDetailActivity.putExtra(MovieDetailActivity.EXTRA_MOVIE, movie);
         startActivity(intentToStartDetailActivity);
     }
 
-    private void showErrorMessage(String message) {
-        /* First, hide the currently visible data */
+    private void showLoading() {
+        Log.d(LOG_TAG, "Loading");
+        // Then, hide the weather data
         mRecyclerView.setVisibility(View.INVISIBLE);
-        /* Then, show the error */
-        if (message != null) {
-            mErrorMessageDisplay.setText(message);
-        }
-        mErrorMessageDisplay.setVisibility(View.VISIBLE);
+        // Finally, show the loading indicator
+        mLoadingIndicator.setVisibility(View.VISIBLE);
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         if (id == R.id.action_sort_popular) {
-            loadMovieData(NetworkUtils.Sort.POPULAR.name());
+            mViewModel.fetchMovies(NetworkUtils.Sort.POPULAR.name());
             return true;
         }
 
         if (id == R.id.action_sort_top_rated) {
-            loadMovieData(NetworkUtils.Sort.TOP_RATED.name());
+            mViewModel.fetchMovies(NetworkUtils.Sort.TOP_RATED.name());
             return true;
         }
 
@@ -105,49 +107,5 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.sort, menu);
         return true;
-    }
-
-    @SuppressLint("StaticFieldLeak")
-    private class FetchMovieTask extends AsyncTask<String, Void, String[]> {
-        private String errorMessage;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mLoadingIndicator.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected String[] doInBackground(String... params) {
-
-            if (params.length == 0) {
-                return null;
-            }
-
-            String sortName = params[0];
-            URL requestUrl = NetworkUtils.buildUrl(NetworkUtils.Sort.valueOf(sortName));
-
-            try {
-                String jsonResponse = NetworkUtils.getResponseFromHttpUrl(requestUrl);
-
-                return MovieJsonUtils.getListFromJson(jsonResponse);
-
-            } catch (Exception e) {
-                errorMessage = "Error: " + e.getMessage();
-                Log.d(TAG, errorMessage);
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String[] movieData) {
-            mLoadingIndicator.setVisibility(View.INVISIBLE);
-            if (movieData != null) {
-                showMovieDataView();
-                mMovieAdapter.setMovieData(movieData);
-            } else {
-                showErrorMessage(errorMessage);
-            }
-        }
     }
 }

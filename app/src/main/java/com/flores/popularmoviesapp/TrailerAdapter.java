@@ -11,9 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.flores.popularmoviesapp.data.Trailer;
-import com.flores.popularmoviesapp.util.MovieJsonUtils;
 
-import org.json.JSONException;
+import java.util.List;
 
 /**
  * {@link TrailerAdapter} exposes a list of movies a
@@ -22,7 +21,7 @@ import org.json.JSONException;
 public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerAdapterViewHolder> {
 
     private final TrailerAdapterOnClickHandler mClickHandler;
-    private String[] mTrailerData;
+    private List<Trailer> mTrailerData;
 
     TrailerAdapter(TrailerAdapterOnClickHandler clickHandler) {
         mClickHandler = clickHandler;
@@ -41,25 +40,19 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerA
 
     @Override
     public void onBindViewHolder(TrailerAdapterViewHolder trailerAdapterViewHolder, int position) {
-        String trailerJson = mTrailerData[position];
+        Trailer trailer = mTrailerData.get(position);
 
-        try {
-            Trailer trailer = MovieJsonUtils.getTrailerFromJson(trailerJson);
-
-            trailerAdapterViewHolder.mTrailerName.setText(trailer.getName());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        trailerAdapterViewHolder.mTrailerName.setText(trailer.getName());
     }
 
     @Override
     public int getItemCount() {
         if (null == mTrailerData) return 0;
-        return mTrailerData.length;
+        return mTrailerData.size();
     }
 
 
-    void setTrailerData(String[] trailerData) {
+    void setTrailerData(List<Trailer> trailerData) {
         mTrailerData = trailerData;
         notifyDataSetChanged();
     }
@@ -80,14 +73,9 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerA
         @Override
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
-            String trailerData = mTrailerData[adapterPosition];
-            try {
-                Trailer trailer = MovieJsonUtils.getTrailerFromJson(trailerData);
+            Trailer trailer = mTrailerData.get(adapterPosition);
 
-                mClickHandler.onClick(trailer);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            mClickHandler.onClick(trailer);
         }
     }
 }

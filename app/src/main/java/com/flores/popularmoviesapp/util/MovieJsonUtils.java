@@ -1,19 +1,22 @@
 package com.flores.popularmoviesapp.util;
 
-import com.flores.popularmoviesapp.data.Movie;
 import com.flores.popularmoviesapp.data.Review;
 import com.flores.popularmoviesapp.data.Trailer;
+import com.flores.popularmoviesapp.data.database.Movie;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Utility functions to handle OpenWeatherMap JSON data.
  */
 public final class MovieJsonUtils {
 
-    public static String[] getListFromJson(String movieJsonStr) throws JSONException {
+    private static String[] getListFromJson(String jsonStr) throws JSONException {
 
         final String RESULT_LIST = "results";
         final String STATUS_CODE = "status_code";
@@ -21,7 +24,7 @@ public final class MovieJsonUtils {
 
         String[] parsedData;
 
-        JSONObject movieJson = new JSONObject(movieJsonStr);
+        JSONObject movieJson = new JSONObject(jsonStr);
 
         /* Is there an error? */
         if (movieJson.has(STATUS_CODE) && movieJson.has(STATUS_MESSAGE)) {
@@ -41,7 +44,46 @@ public final class MovieJsonUtils {
         return parsedData;
     }
 
-    public static Movie getMovieFromJson(String movieJsonStr) throws JSONException {
+    public static List<Movie> getMoviesFromJson(String moviesJsonStr) throws JSONException {
+
+        String[] resultArray = getListFromJson(moviesJsonStr);
+
+        List<Movie> movies = new ArrayList<>();
+
+        for (String s : resultArray) {
+            movies.add(getMovieFromJson(s));
+        }
+
+        return movies;
+    }
+
+    public static List<Trailer> getTrailersFromJson(String trailersJsonStr) throws JSONException {
+
+        String[] resultArray = getListFromJson(trailersJsonStr);
+
+        List<Trailer> trailers = new ArrayList<>();
+
+        for (String s : resultArray) {
+            trailers.add(getTrailerFromJson(s));
+        }
+
+        return trailers;
+    }
+
+    public static List<Review> getReviewsFromJson(String reviewsJsonStr) throws JSONException {
+
+        String[] resultArray = getListFromJson(reviewsJsonStr);
+
+        List<Review> reviews = new ArrayList<>();
+
+        for (String s : resultArray) {
+            reviews.add(getReviewFromJson(s));
+        }
+
+        return reviews;
+    }
+
+    private static Movie getMovieFromJson(String movieJsonStr) throws JSONException {
 
         final String MOVIE_RELEASE_DATE = "release_date";
         final String MOVIE_ID = "id";
@@ -70,7 +112,7 @@ public final class MovieJsonUtils {
         return movie;
     }
 
-    public static Trailer getTrailerFromJson(String trailerJsonStr) throws JSONException {
+    private static Trailer getTrailerFromJson(String trailerJsonStr) throws JSONException {
 
         final String TRAILER_ID = "id";
         final String TRAILER_KEY = "key";
@@ -96,7 +138,7 @@ public final class MovieJsonUtils {
     }
 
 
-    public static Review getReviewFromJson(String reviewJsonStr) throws JSONException {
+    private static Review getReviewFromJson(String reviewJsonStr) throws JSONException {
         final String REVIEW_ID = "id";
         final String REVIEW_AUTHOR = "author";
         final String REVIEW_CONTENT = "content";

@@ -31,6 +31,8 @@
             android:layout_height="220dp"
             android:layout_marginStart="@dimen/padding_regular"
             android:layout_marginTop="@dimen/padding_regular"
+            android:background="@color/lightGrey"
+            android:src="@drawable/ic_image_black_48dp"
             android:contentDescription="@string/image_description"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_detail_title" />
@@ -55,10 +57,25 @@
             android:layout_marginTop="@dimen/padding_regular"
             android:layout_marginEnd="@dimen/padding_regular"
             android:textSize="@dimen/textSize_large"
-            app:layout_constraintBottom_toBottomOf="@+id/iv_detail_movie_poster"
+            app:layout_constraintBottom_toTopOf="@+id/iv_favorite"
             app:layout_constraintStart_toEndOf="@+id/iv_detail_movie_poster"
             app:layout_constraintTop_toBottomOf="@+id/tv_detail_release_date"
             tools:text="8.4" />
+
+        <ImageView
+            android:id="@+id/iv_favorite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/padding_regular"
+            android:layout_marginTop="@dimen/padding_regular"
+            android:layout_marginEnd="@dimen/padding_regular"
+            android:contentDescription="@string/image_favorite"
+            android:src="@drawable/ic_favorite_border_black_48dp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_detail_movie_poster"
+            app:layout_constraintStart_toEndOf="@+id/iv_detail_movie_poster"
+            app:layout_constraintTop_toBottomOf="@+id/tv_detail_vote_average"
+            tools:visibility="visible" />
 
         <TextView
             android:id="@+id/tv_detail_synopsis"

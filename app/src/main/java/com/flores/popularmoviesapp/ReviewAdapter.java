@@ -10,9 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.flores.popularmoviesapp.data.Review;
-import com.flores.popularmoviesapp.util.MovieJsonUtils;
 
-import org.json.JSONException;
+import java.util.List;
 
 /**
  * {@link ReviewAdapter} exposes a list of movies a
@@ -20,7 +19,7 @@ import org.json.JSONException;
  */
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewAdapterViewHolder> {
 
-    private String[] mReviewData;
+    private List<Review> mReviewData;
 
     ReviewAdapter() {
     }
@@ -38,26 +37,20 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewAdap
 
     @Override
     public void onBindViewHolder(ReviewAdapterViewHolder reviewAdapterViewHolder, int position) {
-        String reviewJson = mReviewData[position];
+        Review review = mReviewData.get(position);
 
-        try {
-            Review review = MovieJsonUtils.getReviewFromJson(reviewJson);
-
-            reviewAdapterViewHolder.mReviewAuthor.setText(review.getAuthor());
-            reviewAdapterViewHolder.mReviewContent.setText(review.getContent());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        reviewAdapterViewHolder.mReviewAuthor.setText(review.getAuthor());
+        reviewAdapterViewHolder.mReviewContent.setText(review.getContent());
     }
 
     @Override
     public int getItemCount() {
         if (null == mReviewData) return 0;
-        return mReviewData.length;
+        return mReviewData.size();
     }
 
 
-    void setReviewData(String[] reviewData) {
+    void setReviewData(List<Review> reviewData) {
         mReviewData = reviewData;
         notifyDataSetChanged();
     }
