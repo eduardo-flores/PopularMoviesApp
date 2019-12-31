@@ -15,27 +15,15 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:paddingStart="24dp"
-        android:paddingTop="24dp"
-        android:paddingEnd="24dp"
+        android:paddingStart="@dimen/padding_large"
+        android:paddingTop="@dimen/padding_large"
+        android:paddingEnd="@dimen/padding_large"
         app:spanCount="2" />
-
-    <TextView
-        android:id="@+id/tv_error_message_display"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:textSize="20sp"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <ProgressBar
         android:id="@+id/pb_loading_indicator"
-        android:layout_width="42dp"
-        android:layout_height="42dp"
+        android:layout_width="@dimen/progressBar_size"
+        android:layout_height="@dimen/progressBar_size"
         android:layout_gravity="center"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"

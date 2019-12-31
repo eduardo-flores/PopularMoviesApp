@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/iv_play_trailer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/image_description"
+        android:paddingTop="@dimen/padding_regular"
+        android:paddingBottom="@dimen/padding_regular"
+        android:src="@drawable/ic_play_arrow_black_24dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_trailer_name"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="@dimen/padding_small"
+        app:layout_constraintBottom_toBottomOf="@id/iv_play_trailer"
+        app:layout_constraintStart_toEndOf="@id/iv_play_trailer"
+        app:layout_constraintTop_toTopOf="@id/iv_play_trailer"
+        tools:text="Trailer title" />
+
+    <!--This View serves as a visual divider between list items-->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/line_1dp"
+        android:background="@color/lightGrey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
